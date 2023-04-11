@@ -4,7 +4,6 @@ import tkinter
 from tkinter import ttk
 from tkinter import messagebox
 import string
-import random
 import threading
 import urllib.request as req
 import json
@@ -205,19 +204,17 @@ class App():
              for j in range(1, 2):
                deviceId = 'Device' + str(i)
                tagName = 'PM25' 
-               value =str(data[i-1]['PM25'])
+               value =float(data[i-1]['PM25'])
                tag = EdgeTag(deviceId, tagName, value)
                edgeData.tagList.append(tag)
-             for j in range(1, 2):
-               deviceId = 'Device' + str(i)
+             
                tagName = 'Temperature' 
-               value = str(data[i-1]['Temperature'])
+               value = float(data[i-1]['Temperature'])
                tag = EdgeTag(deviceId, tagName, value)
                edgeData.tagList.append(tag)
-             for j in range(1, 2):
-               deviceId = 'Device' + str(i)
+             
                tagName = 'Relative_humidity' 
-               value = str(data[i-1]['Relative_humidity'])
+               value = float(data[i-1]['Relative_humidity'])
                tag = EdgeTag(deviceId, tagName, value)
                edgeData.tagList.append(tag)
     
@@ -238,31 +235,63 @@ class App():
       nodeConfig = NodeConfig(nodeType = constant.EdgeType['Gateway'])
       config.node = nodeConfig
       for i in range(1, 3):
-        deviceConfig = DeviceConfig(id = 'Device' + str(i),
+          deviceConfig = DeviceConfig(id = 'Device' + str(i),
           name = 'Device' + str(i),
           description = 'Device' + str(i),
           deviceType = 'Smart Device',
           retentionPolicyName = '')
-        print(i)
-        for j in range(1,  2):
-          text = TextTagConfig(name = 'PM25',
-            description = 'PM25 ' ,
+       
+        
+          analog = AnalogTagConfig(name = 'PM25' ,
+            description = 'PM25' ,
             readOnly = False,
-            arraySize = 0)
-          deviceConfig.textTagList.append(text)
-        for j in range(1,  2):
-          text = TextTagConfig(name = 'Temperature',
-            description = 'Temperature ' ,
+            arraySize = 0,
+            spanHigh = 1000,
+            spanLow = 0,
+            engineerUnit = '',
+            integerDisplayFormat = 4,
+            fractionDisplayFormat = 2)
+          deviceConfig.analogTagList.append(analog)
+        
+          analog = AnalogTagConfig(name = 'Temperature' ,
+            description = 'Temperature' ,
             readOnly = False,
-            arraySize = 0)
-          deviceConfig.textTagList.append(text)
-        for j in range(1,  2):
-          text = TextTagConfig(name = 'Relative_humidity',
-            description = 'Relative_humidity ' ,
-            readOnly = False,
-            arraySize = 0)
-          deviceConfig.textTagList.append(text)
-        config.node.deviceList.append(deviceConfig)
+            arraySize = 0,
+            spanHigh = 1000,
+            spanLow = 0,
+            engineerUnit = '',
+            integerDisplayFormat = 4,
+            fractionDisplayFormat = 2)
+          deviceConfig.analogTagList.append(analog)
+        
+          analog = AnalogTagConfig(name = 'Relative_humidity' ,
+                description = 'Relative_humidity' ,
+                readOnly = False,
+                arraySize = 0,
+                spanHigh = 1000,
+                spanLow = 0,
+                engineerUnit = '',
+                integerDisplayFormat = 4,
+                fractionDisplayFormat = 2)
+          deviceConfig.analogTagList.append(analog)
+          
+          config.node.deviceList.append(deviceConfig)
+          ######Discrete#########
+          # discrete = DiscreteTagConfig(name = 'DTag' + str(j),
+          #   description = 'DTag ' + str(j),
+          #   readOnly = False,
+          #   arraySize = 0,
+          #   state0 = '0',
+          #   state1 = '1')
+          # deviceConfig.discreteTagList.append(discrete)
+          #######################
+          ######Text#############
+          # text = TextTagConfig(name = 'TTag' + str(j),
+          #   description = 'TTag ' + str(j),
+          #   readOnly = False,
+          #   arraySize = 0)
+          # deviceConfig.textTagList.append(text)
+          #######################
       return config
 
     def __generateDelteNodeConfig():
@@ -285,17 +314,25 @@ class App():
       nodeConfig = NodeConfig()
       config.node = nodeConfig
       for i in range(1, 3):
-        deviceConfig = DeviceConfig(id = 'Device' + str(i))
-        for j in range(1, 2):
-          text_1 = TextTagConfig(name = 'PM25')
-          deviceConfig.textTagList.append(text_1)
-        for j in range(1, 2):
-          text_2 = TextTagConfig(name = 'Temperature')
-          deviceConfig.textTagList.append(text_2)
-        for j in range(1,2):
-          text_3 = TextTagConfig(name = 'Relative_humidity')
+          deviceConfig = DeviceConfig(id = 'Device' + str(i))
+            
+          text_1 = AnalogTagConfig(name = 'PM25')
+          deviceConfig.analogTagList.append(text_1)
+        
+          text_2 = AnalogTagConfig(name = 'Temperature')
+          deviceConfig.analogTagList.append(text_2)
+      
+          text_3 = AnalogTagConfig(name = 'Relative_humidity')
           deviceConfig.textTagList.append(text_3)
-        config.node.deviceList.append(deviceConfig)
+          config.node.analogTagList.append(deviceConfig)
+          ##########Discrete#############
+          # discrete = DiscreteTagConfig(name = 'DTag' + str(j))
+          # deviceConfig.discreteTagList.append(discrete)
+          ###############################
+          ##########Text#################
+          # text = TextTagConfig(name = 'TTag' + str(j))
+          # deviceConfig.textTagList.append(text)
+          ###############################
       return config
 
     # input
@@ -309,7 +346,7 @@ class App():
     fraquencyFrame.grid(column = 1, row = 3, sticky = 'EWNS')
     ttk.Label(fraquencyFrame, text = 'Data Fredquency:').pack(side = tkinter.TOP)
     App.frequency = tkinter.IntVar()
-    App.frequency.set(1)
+    App.frequency.set(10)
     tkinter.Entry(fraquencyFrame, textvariable = App.frequency, width = 10).pack(side = tkinter.TOP)
 
     # button
